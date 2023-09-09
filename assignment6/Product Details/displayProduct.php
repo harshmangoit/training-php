@@ -11,14 +11,9 @@
 <body>
 
     <?php
-    // Create connectionss
-    $conn = new mysqli("localhost", "root", "root", "mystore_db");
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+    include '../dbConnection.php';
 
-    $sql = "SELECT productname, identifier FROM products";
+    $sql = "SELECT * FROM products";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
@@ -29,6 +24,7 @@
                 <thead>
                     <th>Product name</th>
                     <th>Identifier</th>
+                    <th>Category</th>
                     <th>Action</th>
                 </thead>
                 <!-- output data of each row -->
@@ -41,17 +37,24 @@
                             <?php echo $row["identifier"]; ?>
                         </td>
                         <td>
-                            <?php echo "<a href='updateProduct.php'>Edit</a>"; ?> |
-                            <?php echo "<a href='deleteProduct.php?productname=" . $row['productname'] . "'>Delete</a>"; ?>
+                            <?php echo $row["category"]; ?>
+                        </td>
+                        <td>
+                            <?php echo "<a href='index.php?productid=" . $row['productid'] . "'>Edit</a>"; ?> |
+                            <?php echo "<a href='deleteProduct.php?productid=" . $row['productid'] . "'>Delete</a>"; ?>
                         </td>
                     </tr>
                 <?php } ?>
-            </table>
+            </table><br>
+            <div style="text-align: center;"><a href="index.php">Back</a></div>
         </div>
     <?php
-    } else {
-        echo "<div class='table-container'><h3>Product Details are empty</h3></div>";
-    }
+    } else { ?>
+        <div class='table-container'>
+            <h3>Product Details are empty</h3>
+            <div style="text-align: center;"><a href="index.php">Back</a></div>
+        </div>
+    <?php }
     $conn->close();
     ?>
 </body>

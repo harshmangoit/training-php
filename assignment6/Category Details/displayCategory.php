@@ -11,14 +11,9 @@
 <body>
 
     <?php
-    // Create connectionss
-    $conn = new mysqli("localhost", "root", "root", "mystore_db");
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+    include '../dbConnection.php';
 
-    $sql = "SELECT categoryname, identifier FROM categories";
+    $sql = "SELECT * FROM categories";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
@@ -41,19 +36,24 @@
                             <?php echo $row["identifier"]; ?>
                         </td>
                         <td>
-                            <?php echo "<a href='updateCategory.php'>Edit</a>"; ?> |
-                            <?php echo "<a href='deleteCategory.php?categoryname=" . $row['categoryname'] . "'>Delete</a>"; ?>
+                            <?php echo "<a href='index.php?categoryid=" . $row['categoryid'] . "'>Edit</a>"; ?> |
+                            <?php echo "<a href='deleteCategory.php?categoryid=" . $row['categoryid'] . "'>Delete</a>"; ?>
                         </td>
                     </tr>
                 <?php } ?>
-            </table>
+            </table><br>
+            <div style="text-align: center;"><a href="index.php">Back</a></div>
+
         </div>
+
     <?php
-    } else {
-        echo "<div class='table-container'><h3>Category Details are empty</h3></div>";
-    }
-    $conn->close();
-    ?>
+    } else { ?>
+        <div class='table-container'>
+            <h3>Category Details are empty</h3>
+            <div style="text-align: center;"><a href="index.php">Back</a></div>
+        </div>
+    <?php }
+    $conn->close(); ?>
 </body>
 
 </html>

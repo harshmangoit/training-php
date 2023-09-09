@@ -10,59 +10,73 @@
 
 <body>
     <?php
-    error_reporting(E_ALL);
-    ini_set("display_errors", 1);
+    include '../dbConnection.php';
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $categoryname = $identifier = $categoryid = '';
 
-
-        $categoryname = $_POST["categoryname"];
-        // Category name validation
-        if (empty($categoryname)) {
-            $error = "* This field is required";
-        } else {
-            $error = '';
-        }
-
-        if (empty($_POST["identifier"])) {
-            $identifier = str_replace(' ', '-', strtolower($categoryname));
-        } else {
-            $identifier = $_POST["identifier"];
-        }
-
-        // Create connection
-        $conn = new mysqli("localhost", "root", "root", "mystore_db");
-
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-
-        if ($categoryname && $identifier) {
-            // prepare, bind and execute
-            $stmt = $conn->prepare("INSERT INTO categories (categoryname, identifier) VALUES (?, ?)");
-            $stmt->bind_param("ss", $categoryname, $identifier);
-            $stmt->execute();
-
-            $stmt->close();
-        }
-        $conn->close();
+    // Get Data for Editing
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['categoryid'])) {
+        $categoryid = $_GET['categoryid'];
+        $sql = "SELECT * FROM categories WHERE categoryid='$categoryid'";
+        $result = $conn->query($sql);
+        $row = $result->fetch_assoc();
+        $categoryname = $row['categoryname'];
+        $identifier = $row['identifier'];
     }
+
+    // Add Category
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST["categoryid"]) && isset($_POST["categoryname"]) && isset($_POST["identifier"])) {
+
+            $categoryid = $_POST["categoryid"];
+            $categoryname = $_POST["categoryname"];
+
+            // Category name validation
+            if (empty($categoryname)) {
+                $nameErr = " * Please Enter Category name";
+            } else {
+                $nameErr = '';
+            }
+
+            if (empty($_POST["identifier"])) {
+                $identifier = str_replace(' ', '-', strtolower($categoryname));
+            } else {
+                $identifier = $_POST["identifier"];
+            }
+
+            if ($categoryname && $identifier) {
+                if ($categoryid == 0) {
+                    $sql = "INSERT INTO categories (categoryname, identifier) VALUES ('$categoryname', '$identifier')";
+                } else {
+                    $sql = "UPDATE categories SET categoryname='$categoryname', identifier='$identifier' WHERE categoryid='$categoryid'";
+                }
+                if ($conn->query($sql) === TRUE) {
+                    header("Location: displayCategory.php");
+                } else {
+                    echo "Error: " . $sql . "<br>" . $conn->error;
+                }
+            }
+        }
+    }
+
+    $conn->close();
     ?>
 
     <div class="form-container">
         <h3>Category Details:</h3><br>
 
         <form action="index.php" method="post">
+            <input type="hidden" name="categoryid" value="<?php echo $categoryid; ?>">
             <div class="form-input">
                 <label for="categoryname">Category Name:</label>
-                <input type="text" id="categoryname" name="categoryname" placeholder=" Enter Category Name">
+                <input type="text" id="categoryname" name="categoryname" value="<?php echo $categoryname;
+                                                                                ?>" placeholder=" Enter Category Name">
             </div>
             <div>
                 <div class="error">
                     <?php
-                    if (isset($error)) {
-                        echo $error;
+                    if (isset($nameErr)) {
+                        echo $nameErr;
                     }
                     ?>
                 </div>
@@ -71,12 +85,13 @@
 
             <div class="form-input">
                 <label for="identifier">Identifier:</label>
-                <input type="text" id="identifier" name="identifier" placeholder=" Enter Identifier">
+                <input type="text" id="identifier" name="identifier" value="<?php echo $identifier;
+                                                                            ?>" placeholder=" Enter Identifier">
             </div><br>
 
             <div class=buttons>
                 <div class="submit-button">
-                    <button type="submit">Add</button>
+                    <button type="submit">Save</button>
                 </div>
 
                 <div class="show-button">

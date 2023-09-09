@@ -1,14 +1,9 @@
 <?php
-// Create connectionss
-$conn = new mysqli("localhost", "root", "root", "mystore_db");
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include '../dbConnection.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['categoryname'])) {
-    $categoryname = $_GET['categoryname'];
-    $sql = "DELETE FROM categories WHERE categoryname='$categoryname'";
+if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['categoryid'])) {
+    $categoryid = $_GET['categoryid'];
+    $sql = "DELETE FROM categories WHERE categoryid='$categoryid'";
 
     if ($conn->query($sql) === TRUE) {
         header("Location: displayCategory.php");

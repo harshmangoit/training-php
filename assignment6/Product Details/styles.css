@@ -86,7 +86,7 @@ td {
 }
 
 .table-container {
-  max-width: 500px;
+  width: 500px;
   margin: 0 auto;
   margin-top: 120px;
   padding: 25px;
